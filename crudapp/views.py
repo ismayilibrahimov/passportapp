@@ -12,7 +12,8 @@ class CustomerViewset(viewsets.ModelViewSet):
     def destroy(self, request, *args, **kwargs):
         customer = self.get_object()
         for passport in customer.passports.all():
-            passport.delete()
+            passport.deleted_at = timezone.now()
+            passport.save()
 
         customer.deleted_at = timezone.now()
         customer.save()
@@ -22,3 +23,9 @@ class CustomerViewset(viewsets.ModelViewSet):
 class PassportViewset(viewsets.ModelViewSet):
     queryset = models.Passport.objects.all()
     serializer_class = serializers.PassportSerializer
+
+    def destroy(self, request, *args, **kwargs):
+        passport = self.get_object()
+        passport.deleted_at = timezone.now()
+        passport.save()
+        return Response({"message": "passport details deleted successfully!"})
